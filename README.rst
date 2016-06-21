@@ -9,6 +9,14 @@ The library provides flash messages for `aiohttp.web`_ on top of `aiohttp_sessio
 “Flash messages” are simply a queue of string messages (or other JSON-serializable objects) stored in the session.
 
 
+Installation
+============
+
+::
+
+	pip install aiohttp_session_flash
+
+
 Usage
 =====
 
