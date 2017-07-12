@@ -21,17 +21,13 @@ def find_unused_port():
 def test_flash(app):
 	
 	async def test():
-		handler = app.make_handler()
-		port = find_unused_port()
-		srv = await app.loop.create_server(handler, '127.0.0.1', port)
-		url = "http://127.0.0.1:{}".format(port)
-
 		async def json_context_processor(request):
-			return {
-				'json': lambda value: json.dumps(value)
-			}
+			return {'json': lambda value: json.dumps(value)}
 
-		lookup = aiohttp_mako.setup(app, context_processors=[aiohttp_session_flash.context_processor, json_context_processor])
+		lookup = aiohttp_mako.setup(app, context_processors=[
+			aiohttp_session_flash.context_processor,
+			json_context_processor,
+		])
 		lookup.put_string('index.html', '${json(get_flashed_messages())}')
 	
 		async def save(request):
@@ -58,6 +54,11 @@ def test_flash(app):
 		app.router.add_route('GET', '/save_array', save_array)
 		app.router.add_route('GET', '/show', show)
 		app.router.add_route('GET', '/show_context_processor', show_context_processor)
+
+		handler = app.make_handler()
+		port = find_unused_port()
+		srv = await app.loop.create_server(handler, '127.0.0.1', port)
+		url = "http://127.0.0.1:{}".format(port)
 	
 		async with aiohttp.ClientSession() as session:
 			async with session.get(url+'/save') as resp:
