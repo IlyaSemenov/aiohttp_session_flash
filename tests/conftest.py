@@ -1,10 +1,9 @@
 import asyncio
 
-from aiohttp import web
 import aiohttp_session
 import aiohttp_session_flash
-from aiohttp_session.cookie_storage import EncryptedCookieStorage
 import pytest
+from aiohttp import web
 
 
 @pytest.yield_fixture
@@ -23,7 +22,7 @@ def app(loop):
 	app = web.Application(
 		loop=loop,
 		middlewares=[
-			aiohttp_session.session_middleware(EncryptedCookieStorage(b'x'*32)),
+			aiohttp_session.session_middleware(aiohttp_session.SimpleCookieStorage()),
 			aiohttp_session_flash.middleware,
 		]
 	)
