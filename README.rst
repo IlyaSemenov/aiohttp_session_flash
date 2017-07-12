@@ -81,6 +81,6 @@ Running tests
 
 ::
 
-    pip install -r requirements_test.txt
-    pytest
+	pip install -r requirements_test.txt
+	pytest
 
