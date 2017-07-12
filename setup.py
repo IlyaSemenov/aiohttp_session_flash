@@ -1,10 +1,6 @@
-# coding=utf-8
-from distutils.core import setup
+"""Session flash messages for aiohttp.web"""
 from setuptools import setup, find_packages
 
-"""
-Session flash messages for aiohttp.web
-"""
 
 setup(
 	name='aiohttp_session_flash',
@@ -16,6 +12,6 @@ setup(
 	description=__doc__,
 	long_description=open('README.rst').read(),
 	packages=['aiohttp_session_flash'],
-	install_requires=['aiohttp>=0.21.6', 'aiohttp_session>=0.5.0'],
+	install_requires=['aiohttp>=0.21.6,<0.22', 'aiohttp_session>=0.5,<0.6'],
 	classifiers=[],
 )

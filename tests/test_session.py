@@ -3,6 +3,8 @@ import json
 import socket
 
 import aiohttp
+import aiohttp_mako
+import aiohttp_session_flash
 from aiohttp import web
 from aiohttp_session_flash import flash, pop_flash
 import pytest
@@ -23,6 +25,14 @@ def test_flash(app):
 		port = find_unused_port()
 		srv = await app.loop.create_server(handler, '127.0.0.1', port)
 		url = "http://127.0.0.1:{}".format(port)
+
+		async def json_context_processor(request):
+			return {
+				'json': lambda value: json.dumps(value)
+			}
+
+		lookup = aiohttp_mako.setup(app, context_processors=[aiohttp_session_flash.context_processor, json_context_processor])
+		lookup.put_string('index.html', '${json(get_flashed_messages())}')
 	
 		async def save(request):
 			flash(request, "Hello")
@@ -37,12 +47,17 @@ def test_flash(app):
 			return web.Response(body=b'OK')
 
 		async def show(request):
-			return web.Response(body="|".join(map(json.dumps, pop_flash(request))).encode('utf-8'))
+			return web.Response(body=json.dumps(pop_flash(request)).encode('utf-8'))
+		
+		@aiohttp_mako.template('index.html')
+		async def show_context_processor(request):
+			return {}
 		
 		app.router.add_route('GET', '/save', save)
 		app.router.add_route('GET', '/save_redirect', save_redirect)
 		app.router.add_route('GET', '/save_array', save_array)
 		app.router.add_route('GET', '/show', show)
+		app.router.add_route('GET', '/show_context_processor', show_context_processor)
 	
 		with aiohttp.ClientSession() as session:
 			async with session.get(url+'/save') as resp:
@@ -56,10 +71,17 @@ def test_flash(app):
 	
 			async with session.get(url+'/show') as resp:
 				assert resp.status == 200
-				assert (await resp.text()) == '"Hello"|"Redirect"|["This", "works", "too"]'
+				assert (await resp.text()) == '["Hello", "Redirect", ["This", "works", "too"]]'
 
 			async with session.get(url+'/show') as resp:
 				assert resp.status == 200
-				assert (await resp.text()) == ''
+				assert (await resp.text()) == '[]'
+
+			async with session.get(url+'/save') as resp:
+				assert resp.status == 200
+
+			async with session.get(url+'/show_context_processor') as resp:
+				assert resp.status == 200
+				assert (await resp.text()) == '["Hello"]'
 
 	app.loop.run_until_complete(test())

@@ -41,6 +41,7 @@ def middleware(app, handler):
 	return process
 
 
+@asyncio.coroutine
 def context_processor(request):
 	return {
 		'get_flashed_messages': partial(pop_flash, request),

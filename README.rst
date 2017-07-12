@@ -70,3 +70,17 @@ The template context processor is provided for template libraries that can use i
 		<li>${message}</li>
 	% endfor
 	</ul>
+
+
+Contributing
+============
+
+
+Running tests
+-------------
+
+::
+
+    pip install -r requirements_test.txt
+    pytest
+
