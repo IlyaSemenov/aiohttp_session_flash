@@ -12,6 +12,6 @@ setup(
 	description=__doc__,
 	long_description=open('README.rst').read(),
 	packages=['aiohttp_session_flash'],
-	install_requires=['aiohttp>=0.21.6,<0.22', 'aiohttp_session>=0.5,<0.6'],
+	install_requires=['aiohttp>=0.21.6,<1.1', 'aiohttp-session>=0.5'],
 	classifiers=[],
 )

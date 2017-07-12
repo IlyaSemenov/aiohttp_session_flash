@@ -59,29 +59,36 @@ def test_flash(app):
 		app.router.add_route('GET', '/show', show)
 		app.router.add_route('GET', '/show_context_processor', show_context_processor)
 	
-		with aiohttp.ClientSession() as session:
+		async with aiohttp.ClientSession() as session:
 			async with session.get(url+'/save') as resp:
 				assert resp.status == 200
+				session.cookie_jar.update_cookies(resp.cookies)  # something in the response prevents this from happening automatically.
 
 			async with session.get(url+'/save_redirect', allow_redirects=False) as resp:
 				assert resp.status == 302
+				session.cookie_jar.update_cookies(resp.cookies)
 
 			async with session.get(url+'/save_array') as resp:
 				assert resp.status == 200
+				session.cookie_jar.update_cookies(resp.cookies)
 	
 			async with session.get(url+'/show') as resp:
 				assert resp.status == 200
 				assert (await resp.text()) == '["Hello", "Redirect", ["This", "works", "too"]]'
+				session.cookie_jar.update_cookies(resp.cookies)
 
 			async with session.get(url+'/show') as resp:
 				assert resp.status == 200
 				assert (await resp.text()) == '[]'
+				session.cookie_jar.update_cookies(resp.cookies)
 
 			async with session.get(url+'/save') as resp:
 				assert resp.status == 200
+				session.cookie_jar.update_cookies(resp.cookies)
 
 			async with session.get(url+'/show_context_processor') as resp:
 				assert resp.status == 200
 				assert (await resp.text()) == '["Hello"]'
+				session.cookie_jar.update_cookies(resp.cookies)
 
 	app.loop.run_until_complete(test())
